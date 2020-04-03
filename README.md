@@ -1,4 +1,4 @@
-#Hexagonal binning with transparency for single cell data
+# Hexagonal binning with transparency for single cell data
 
 
 `hexDimRed`

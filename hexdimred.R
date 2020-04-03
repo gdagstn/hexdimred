@@ -1,3 +1,19 @@
+#' Plot dimensionality reduction as hexagon bins with summary stats
+#'
+#' @param o a SingleCellExperiment class object
+#' @param dimred character, name of the slot (called by \code{reducedDim}) containing the dimensionality reduction in o. Default is "PCA"
+#' @param dims_use numeric, vector of 2 coordinates of the dimensionality reduction to be plotted. Default is 1, 2
+#' @param alpha_by function used to set the alpha value of each bin. Default is \code{length}
+#' @param stat_fun_numeric character, name of the function used to summarize the numeric value in each bin. Default is "median"
+#' @param stat_fun_categorical character, name of the function used to summarize the factor value in each bin. If \code{prop}, 
+#' it calculates the proportion of the most abundant factor against the others (useful for factors with 2 levels). If \code{maj},
+#' it calculates which of the factor levels is the most abundant in each bin (useful for factors with > 2 levels).
+#' @param nbins number of bins to group and plot the data. Default is 40
+#' @param other_fields character, vector of column names from colData to be used as continuous or grouping variables.
+#' @param subset list, colData field and levels to subset the object. Takes the name of the list element as colData field and 
+#' its contents as levels of the field.
+#' @return a list of ggplot2 hex-bin plots.
+
 
 hexDimRed <- function(o,
                       dimred = "PCA",

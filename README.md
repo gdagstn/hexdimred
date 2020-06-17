@@ -69,9 +69,9 @@ sce_hexdim2 <- hexDimRed(sce,
                        )
 
 
-gridExtra::grid.arrange(grobs = ct_hexdim[c(1,4)], ncol = 2)
-gridExtra::grid.arrange(grobs = c(ct_hexdim[4], ct_hexdim2[2]), ncol = 2)
-gridExtra::grid.arrange(grobs = ct_hexdim2[c(3,4)], ncol = 2)
+gridExtra::grid.arrange(grobs = sce_hexdim[c(1,4)], ncol = 2)
+gridExtra::grid.arrange(grobs = c(sce_hexdim[4], sce_hexdim2[2]), ncol = 2)
+gridExtra::grid.arrange(grobs = sce_hexdim2[c(3,4)], ncol = 2)
 ```
 
 ![pca_1](/figures/pca1.png)

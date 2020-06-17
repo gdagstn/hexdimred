@@ -12,8 +12,8 @@
 #' @param main_field character, name of the field to be plotted first. Defaults to "n_UMI". If NULL, gives an "unlabeled" density plot
 #' @param nbins number of bins to group and plot the data. Default is 40
 #' @param other_fields character, vector of column names from colData to be used as continuous or grouping variables.
-#' @param plot.genes character, vector of gene names to be plotted
-#' @param gene.counts character, assay used for gene plots
+#' @param plot_genes character, vector of gene names to be plotted
+#' @param gene_counts character, assay used for gene plots
 #' @param custom_cat_cols character, a vector of colours to be used in categorical variables. For the colour assignment to work, colours
 #' must be' ordered in the same ordered as the levels of the factor that is being plotted. If NULL, defaults to the standard ggplot2 colour scheme
 #' @param custom_cont_cols character, a vector of colours to be used in continuous variables. If NULL, defaults to viridis (option D)
@@ -33,8 +33,8 @@ hexDimRed <- function(o,
                       nbins = 40,
                       main_field = "n_UMI",
                       other_fields = NULL,
-                      plot.genes = NULL,
-                      gene.counts = "logcounts",
+                      plot_genes = NULL,
+                      gene_counts = "logcounts",
                       custom_cat_cols = NULL,
                       custom_cont_cols = NULL,
                       subset = NULL,
@@ -88,12 +88,12 @@ if(!is.null(subset)) {
 
 if(length(dims_use) <= 1) stop("Need 2 dimensions to plot")
 
-if(!is.null(plot.genes) & length(intersect(plot.genes, rownames(o))) == 0) {
-  plot.genes = NULL
+if(!is.null(plot_genes) & length(intersect(plot_genes, rownames(o))) == 0) {
+  plot_genes = NULL
   print("Selected genes were not found in the object, setting them to NULL")
-} else if(!is.null(plot.genes) & !all(plot.genes %in% rownames(o))) {
-  not.found <-  setdiff(plot.genes, rownames(o))
-  plot.genes <- intersect(plot.genes, rownames(o))
+} else if(!is.null(plot_genes) & !all(plot_genes %in% rownames(o))) {
+  not.found <-  setdiff(plot_genes, rownames(o))
+  plot_genes <- intersect(plot_genes, rownames(o))
   print(paste0("The following genes were not found in the object: ", paste(not.found, collapse = ", ")))
 }
 
@@ -144,14 +144,15 @@ p1 <- ggplot(data = tmp, aes(x = Dim1, y = Dim2)) +
 if(is.null(main_field)) {
   if (dimred == "PCA" | dimred == "pca") {
   p1 <- p1 +
-  labs(title = paste0(dimred, " by ", main_field), 
+  labs(title = paste0(dimred, " cell density per bin"), 
     x = paste0(coln_xy[1], " - ", pctvar[dims_use[1]], "% variance"),
     y = paste0(coln_xy[2], " - ", pctvar[dims_use[2]], "% variance"),
     alpha = paste0(alpha_by, " of observations in bin (log10)")
-   ) } else {
+   ) 
+  } else {
 
    p1 <- p1 +
-  labs(title = paste0(dimred, " by ", main_field), 
+  labs(title = paste0(dimred, " cell density per bin"), 
    x = coln_xy[1],
    y = coln_xy[2],
    alpha = paste0(alpha_by, " of observations in bin (log10)")
@@ -331,6 +332,52 @@ if(labels != "none") {
   }
 }
 
+if(!is.null(plot_genes)) {
+
+  tmp2 <- as.data.frame(cbind(t(assay(o[plot_genes,], gene_counts)), reducedDim(o, dimred)[,dims_use]))
+
+  coln_xy = colnames(tmp2)[(ncol(tmp2) - 1) : (ncol(tmp2))]
+
+  colnames(tmp2)[(ncol(tmp2) - 1) : (ncol(tmp2))] <- c("Dim1", "Dim2")
+
+  colnames(tmp2)[1:length(plot_genes)] <-  plot_genes
+
+  geneplotlist <- list()
+
+  for(g in (plot_genes)){
+
+    geneplotlist[[g]] <- ggplot(data = tmp2, aes(x = Dim1, y = Dim2, group = 1)) +
+      stat_summaries_hex(
+      aes(z = !!ensym(g), fill = stat(mean), alpha = stat(log10(n))),
+      funs = c("mean", n = "length"),
+      bins = nbins
+       ) +
+      scale_fill_gradient(low = "gray", high = "midnightblue") +
+      theme
+
+    if (dimred == "PCA") {
+
+        geneplotlist[[g]]  <- geneplotlist[[g]]  +
+        labs(title = paste0(i, " (", gene_counts, ") - (", dimred, ")"), 
+        x = paste0(coln_xy[1], " - ", pctvar[dims_use[1]], "% variance"),
+        y = paste0(coln_xy[2], " - ", pctvar[dims_use[2]], "% variance"),
+        fill = paste0(stat_fun_numeric, " ", g, " in bin"),
+        alpha = paste0(alpha_by, " of observations in bin (log10)")
+     ) 
+
+      } else {
+
+        geneplotlist[[g]]  <- geneplotlist[[g]]  +
+        labs(title = paste0(g, " (", gene_counts, ") - (", dimred, ")"), 
+        x = coln_xy[1],
+        y = coln_xy[2],
+        fill = paste0(stat_fun_numeric, " ", g, " in bin"),
+        alpha = paste0(alpha_by, " of observations in bin (log10)")
+      )
+      }
+   }
+  }                                   
+                                   
 # Final assembly conditional on selected fields
 
   if(!is.null(main_field)) {
@@ -341,7 +388,7 @@ if(labels != "none") {
 
   if(!is.null(other_fields)) finallist <- c(finallist, addedplotlist)
 
-  if(!is.null(plot.genes)) finallist <- c(finallist, geneplotlist)
+  if(!is.null(plot_genes)) finallist <- c(finallist, geneplotlist)
 
   return(finallist)
 

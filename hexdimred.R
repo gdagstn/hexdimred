@@ -44,6 +44,8 @@ hexDimRed <- function(o,
 
 require(ggplot2)
 require(ggplot.multistats)
+require(scater)
+require(viridis)
 
 # Sanity checks
 if (class(o) != "SingleCellExperiment") stop("o must be an object of class SingleCellExperiment")

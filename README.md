@@ -122,5 +122,5 @@ sce_hexdim4 <- hexDimRed(sce,
 
 sce_hexdim4[[2]]
 ```
-```
+
 ![sc_umap_1](/figures/sc_umap_4.png)

@@ -13,8 +13,11 @@ This is exactly what `schex`(https://github.com/SaskiaFreytag/schex) does, but w
 
 3) the `alpha` aesthetic is set independently by `alpha_by` and can be the number (`length`) of observations, or any other operation performed on each bin.
 
-A plot of `n_UMI` is always generated as the first in the list that this function returns.
+4) gene expression values can be plotted specifying the `assay`
 
+5) the user can supply custom color scales
+
+The output is a list of `ggplot` objects.
 
 Usage:
 
@@ -75,4 +78,49 @@ gridExtra::grid.arrange(grobs = ct_hexdim2[c(3,4)], ncol = 2)
 ![pca_2](/figures/pca2.png)
 ![pca_3](/figures/pca3.png)
 
----
+As of June 17 2020, there are some additional functionalities:
+
+- if there is no `n_UMI` column in the object, a simple density of cells in the bin will be plotted
+- support for user supplied scales, both continuous (`custom_cont_cols`) and discrete/categorical (`custom_cat_cols`). Importantly, for the categorical variables, the color vector order will be matched with the factor order specified in `other_fields` using `stat_fun_categorical = "maj"`.
+- gene expression can be plotted via `plot_genes`, supplying the expression assay (default is `lognormcounts`)
+- labels can be added with 2 styles: `sticker` (rounded box with solid background) or `text` (text only with no box)
+- dark theme enabled
+
+```r
+sce_hexdim3 <- hexDimRed(sce, 
+          main_field = NULL,
+          other_fields = "clustering_result", 
+          stat_fun_categorical = "maj", 
+          dimred = "UMAP", 
+          nbins = 60,
+          labels = "sticker",
+          custom_cat_cols = custom.colors,
+          plot_genes = "ENSG00000198963")
+          
+sce_hexdim3[[1]]
+sce_hexdim3[[2]]
+sce_hexdim3[[3]]
+```
+![sc_umap_1](/figures/sc_umap_1.png)
+![sc_umap_2](/figures/sc_umap_2.png)
+![sc_umap_3](/figures/sc_umap_3.png)
+
+
+Dark mode:
+
+```r
+sce_hexdim4 <- hexDimRed(sce, 
+          main_field = NULL,
+          other_fields = "clustering_result", 
+          stat_fun_categorical = "maj", 
+          dimred = "UMAP", 
+          nbins = 60,
+          labels = "sticker",
+          custom_cat_cols = custom.colors
+          dark = TRUE)
+          
+
+sce_hexdim4[[2]]
+```
+```
+![sc_umap_1](/figures/sc_umap_4.png)
